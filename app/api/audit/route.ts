@@ -22,7 +22,8 @@ export async function POST(req: Request) {
     return Response.json(
       {
         error:
-          error.message || "Something went wrong while auditing the landing page",
+          error.message ||
+          "Something went wrong while auditing the landing page",
       },
       { status: 500 }
     );
