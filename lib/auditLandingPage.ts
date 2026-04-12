@@ -17,8 +17,8 @@ export async function auditLandingPage(
   const html = await response.text();
   const lowerHtml = html.toLowerCase();
 
-  const h1Match = html.match(/<h1[^>]*>(.*?)<\/h1>/is);
-  const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
+const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
 
   const buttonMatches = [...html.matchAll(/<(button|a)[^>]*>(.*?)<\/(button|a)>/gis)];
   const buttons = buttonMatches
