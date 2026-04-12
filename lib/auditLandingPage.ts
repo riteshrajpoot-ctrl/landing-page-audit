@@ -20,7 +20,7 @@ export async function auditLandingPage(
 const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
 const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
 
-  const buttonMatches = [...html.matchAll(/<(button|a)[^>]*>(.*?)<\/(button|a)>/gis)];
+  const buttonMatches = [...html.matchAll(/<(button|a)[^>]*>([\s\S]*?)<\/(button|a)>/gi),];
   const buttons = buttonMatches
     .map((match) => match[2].replace(/<[^>]+>/g, "").trim())
     .filter(Boolean);
