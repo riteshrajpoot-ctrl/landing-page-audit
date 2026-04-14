@@ -4,6 +4,7 @@ import { useState } from "react";
 import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
+<BreakdownChart sections={result.sections} /> 
 import BreakdownChart from "./BreakdownChart";
 
 type AuditSectionType = {
