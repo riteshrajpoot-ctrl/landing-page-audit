@@ -385,7 +385,7 @@ export async function auditLandingPage(
     biggestLeak: {
       title: biggestProblem.title,
       score: biggestProblem.score,
-      finding: biggestProblem.findings[0] || "This area needs improvement.",
+      finding: `Your page has issues with ${biggestProblem.title.toLowerCase()}, which may reduce conversions.` || "This area needs improvement.",
       recommendation:
         biggestProblem.recommendations[0] || "Improve this section first.",
     },

@@ -4,6 +4,7 @@ import { useState } from "react";
 import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
+import BreakdownChart from "./BreakdownChart";
 
 type AuditSectionType = {
   title: string;
@@ -111,7 +112,7 @@ export default function AuditForm() {
 
       {error && <div className="error-box">{error}</div>}
 
-      {result && (
+            {result && (
         <>
           <ScoreCard
             score={result.score}
