@@ -17,10 +17,13 @@ export async function auditLandingPage(
   const html = await response.text();
   const lowerHtml = html.toLowerCase();
 
-const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
-const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
+  const h1Match = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+  const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
 
-  const buttonMatches = [...html.matchAll(/<(button|a)[^>]*>([\s\S]*?)<\/(button|a)>/gi),];
+  const buttonMatches = [
+    ...html.matchAll(/<(button|a)[^>]*>([\s\S]*?)<\/(button|a)>/gi),
+  ];
+
   const buttons = buttonMatches
     .map((match) => match[2].replace(/<[^>]+>/g, "").trim())
     .filter(Boolean);
@@ -31,7 +34,8 @@ const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
     (html.match(/<textarea/gi) || []).length +
     (html.match(/<select/gi) || []).length;
 
-  const bodyText = html.replace(/<script[\s\S]*?<\/script>/gi, "")
+  const bodyText = html
+    .replace(/<script[\s\S]*?<\/script>/gi, "")
     .replace(/<style[\s\S]*?<\/style>/gi, "")
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
@@ -211,12 +215,143 @@ const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
       : ["Form and page flow look reasonably conversion-friendly."],
   });
 
-  const totalScore = sections.reduce((sum, section) => sum + section.score, 0);
+  let speedScore = 20;
+  const speedFindings: string[] = [];
+  const speedRecommendations: string[] = [];
+
+  const htmlSizeKb = Buffer.byteLength(html, "utf8") / 1024;
+  const scriptCount = (html.match(/<script/gi) || []).length;
+  const imageCount = (html.match(/<img/gi) || []).length;
+  const iframeCount = (html.match(/<iframe/gi) || []).length;
+  const stylesheetCount =
+    (html.match(/<link[^>]+stylesheet/gi) || []).length;
+
+  if (htmlSizeKb > 300) {
+    speedScore -= 5;
+    speedFindings.push(
+      `Large HTML payload detected (${Math.round(htmlSizeKb)} KB).`
+    );
+    speedRecommendations.push(
+      "Reduce unnecessary markup and compress page resources."
+    );
+  } else {
+    speedFindings.push(`HTML size looks manageable (${Math.round(htmlSizeKb)} KB).`);
+  }
+
+  if (scriptCount > 12) {
+    speedScore -= 5;
+    speedFindings.push(`Heavy script usage detected (${scriptCount} scripts).`);
+    speedRecommendations.push(
+      "Reduce non-essential scripts and defer unused JavaScript."
+    );
+  }
+
+  if (imageCount > 20) {
+    speedScore -= 4;
+    speedFindings.push(`High image count detected (${imageCount} images).`);
+    speedRecommendations.push(
+      "Compress images and lazy-load below-the-fold assets."
+    );
+  }
+
+  if (iframeCount > 0) {
+    speedScore -= 2;
+    speedFindings.push(`Embedded iframe content found (${iframeCount} iframe(s)).`);
+    speedRecommendations.push(
+      "Minimize heavy embeds that can slow initial page rendering."
+    );
+  }
+
+  if (stylesheetCount > 5) {
+    speedScore -= 2;
+    speedFindings.push(
+      `Multiple stylesheets detected (${stylesheetCount} CSS files).`
+    );
+    speedRecommendations.push(
+      "Reduce CSS requests and remove unused styles where possible."
+    );
+  }
+
+  sections.push({
+    title: "Page Speed",
+    score: Math.max(speedScore, 0),
+    findings: speedFindings.length ? speedFindings : ["No major speed issues detected."],
+    recommendations: speedRecommendations.length
+      ? speedRecommendations
+      : ["Page structure looks reasonably lightweight."],
+  });
+
+  let mobileScore = 20;
+  const mobileFindings: string[] = [];
+  const mobileRecommendations: string[] = [];
+
+  const hasViewportMeta = /<meta[^>]+name=["']viewport["'][^>]*>/i.test(html);
+  const inlineWidthCount = (html.match(/width=["']\d+["']/gi) || []).length;
+  const inlineFixedPxCount = (html.match(/:\s*\d+px/gi) || []).length;
+
+  if (!hasViewportMeta) {
+    mobileScore -= 8;
+    mobileFindings.push("Viewport meta tag is missing.");
+    mobileRecommendations.push(
+      "Add a viewport meta tag for proper mobile responsiveness."
+    );
+  } else {
+    mobileFindings.push("Viewport meta tag is present.");
+  }
+
+  if (fieldCount > 7) {
+    mobileScore -= 4;
+    mobileFindings.push("Long forms can create friction on mobile devices.");
+    mobileRecommendations.push(
+      "Shorten forms to improve mobile completion rate."
+    );
+  }
+
+  if (inlineWidthCount > 10 || inlineFixedPxCount > 25) {
+    mobileScore -= 4;
+    mobileFindings.push("Multiple fixed-width elements may hurt mobile flexibility.");
+    mobileRecommendations.push(
+      "Avoid rigid widths and use responsive layout styling."
+    );
+  }
+
+  if (buttons.length === 0) {
+    mobileScore -= 2;
+    mobileFindings.push("No prominent tap-friendly CTA elements were detected.");
+    mobileRecommendations.push(
+      "Use clear, large tap-friendly CTA buttons for mobile users."
+    );
+  }
+
+  if (bodyText.length > 4000) {
+    mobileScore -= 2;
+    mobileFindings.push("Very dense content may be harder to scan on small screens.");
+    mobileRecommendations.push(
+      "Break content into smaller sections for easier mobile reading."
+    );
+  }
+
+  sections.push({
+    title: "Mobile Friendliness",
+    score: Math.max(mobileScore, 0),
+    findings: mobileFindings.length
+      ? mobileFindings
+      : ["No major mobile issues detected."],
+    recommendations: mobileRecommendations.length
+      ? mobileRecommendations
+      : ["Page appears reasonably mobile-friendly."],
+  });
+
+  const totalScore = Math.round(
+    sections.reduce((sum, section) => sum + section.score, 0) / sections.length * 5
+  );
 
   let grade = "Needs Improvement";
   if (totalScore >= 85) grade = "Excellent";
   else if (totalScore >= 70) grade = "Good";
   else if (totalScore >= 50) grade = "Average";
+
+  const biggestProblem = [...sections].sort((a, b) => a.score - b.score)[0];
 
   const topFixes = sections
     .flatMap((section) => section.recommendations)
@@ -227,8 +362,8 @@ const h1 = h1Match ? h1Match[1].replace(/<[^>]+>/g, "").trim() : "";
     grade,
     summary:
       totalScore >= 70
-        ? "The landing page has a decent foundation, but there are still opportunities to improve conversion performance."
-        : "The page has visible gaps in messaging, trust, CTA clarity, or user flow.",
+        ? `The page has a decent foundation, but ${biggestProblem.title.toLowerCase()} still needs improvement for better conversion performance.`
+        : `The page has visible gaps across messaging, usability, or performance. The biggest issue appears to be ${biggestProblem.title.toLowerCase()}.`,
     sections,
     topFixes,
   };
