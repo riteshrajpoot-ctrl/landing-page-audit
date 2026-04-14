@@ -5,6 +5,7 @@ import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
 import BreakdownChart from "./BreakdownChart";
+import SectionDistributionChart from "./SectionDistributionChart";
 
 type AuditSectionType = {
   title: string;
@@ -128,12 +129,14 @@ export default function AuditForm() {
             recommendation={result.biggestLeak.recommendation}
           />
           <BreakdownChart sections={result.sections} />
-          
+
           <div className="section-grid">
-            {result.sections.map((section, index) => (
-              <AuditSection key={index} section={section} />
-            ))}
-          </div>
+  {result.sections.map((section, index) => (
+    <AuditSection key={index} section={section} />
+  ))}
+
+  <SectionDistributionChart sections={result.sections} />
+</div>
         </>
       )}
     </div>
