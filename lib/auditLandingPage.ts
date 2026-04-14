@@ -42,8 +42,12 @@ export async function auditLandingPage(
     .trim();
 
   const keywordLower = keyword.toLowerCase();
-
-  const sections = [];
+  const sections: {
+    title: string;
+    score: number;
+    findings: string[];
+    recommendations: string[];
+  }[] = [];
 
   let headlineScore = 20;
   const headlineFindings: string[] = [];
@@ -57,6 +61,7 @@ export async function auditLandingPage(
     );
   } else {
     headlineFindings.push(`Main headline found: "${h1}"`);
+
     if (keyword && !h1.toLowerCase().includes(keywordLower)) {
       headlineScore -= 4;
       headlineFindings.push("Target keyword is not present in the main headline.");
@@ -64,6 +69,7 @@ export async function auditLandingPage(
         "Include the target keyword naturally in the main headline."
       );
     }
+
     if (h1.length < 6) {
       headlineScore -= 3;
       headlineFindings.push("Headline is too short to communicate value.");
@@ -153,7 +159,9 @@ export async function auditLandingPage(
   sections.push({
     title: "Trust Signals",
     score: Math.max(trustScore, 0),
-    findings: trustFindings.length ? trustFindings : ["Trust elements are present."],
+    findings: trustFindings.length
+      ? trustFindings
+      : ["Trust elements are present."],
     recommendations: trustRecommendations.length
       ? trustRecommendations
       : ["Trust elements are present."],
@@ -223,8 +231,7 @@ export async function auditLandingPage(
   const scriptCount = (html.match(/<script/gi) || []).length;
   const imageCount = (html.match(/<img/gi) || []).length;
   const iframeCount = (html.match(/<iframe/gi) || []).length;
-  const stylesheetCount =
-    (html.match(/<link[^>]+stylesheet/gi) || []).length;
+  const stylesheetCount = (html.match(/<link[^>]+stylesheet/gi) || []).length;
 
   if (htmlSizeKb > 300) {
     speedScore -= 5;
@@ -272,10 +279,16 @@ export async function auditLandingPage(
     );
   }
 
+  if (speedFindings.length === 1 && speedRecommendations.length === 0) {
+    speedFindings.push("No major render-blocking risks detected from HTML structure.");
+  }
+
   sections.push({
     title: "Page Speed",
     score: Math.max(speedScore, 0),
-    findings: speedFindings.length ? speedFindings : ["No major speed issues detected."],
+    findings: speedFindings.length
+      ? speedFindings
+      : ["No major speed issues detected."],
     recommendations: speedRecommendations.length
       ? speedRecommendations
       : ["Page structure looks reasonably lightweight."],
@@ -323,6 +336,10 @@ export async function auditLandingPage(
     );
   }
 
+  if (buttons.length === 0 || strongCtas.length === 0) {
+    mobileFindings.push("Primary CTA may not be visible early on mobile screens.");
+  }
+
   if (bodyText.length > 4000) {
     mobileScore -= 2;
     mobileFindings.push("Very dense content may be harder to scan on small screens.");
@@ -342,9 +359,10 @@ export async function auditLandingPage(
       : ["Page appears reasonably mobile-friendly."],
   });
 
-  const totalScore = Math.round(
-    sections.reduce((sum, section) => sum + section.score, 0) / sections.length * 5
-  );
+  const averageSectionScore =
+    sections.reduce((sum, section) => sum + section.score, 0) / sections.length;
+
+  const totalScore = Math.round(averageSectionScore * 5);
 
   let grade = "Needs Improvement";
   if (totalScore >= 85) grade = "Excellent";
@@ -357,7 +375,7 @@ export async function auditLandingPage(
     .flatMap((section) => section.recommendations)
     .slice(0, 5);
 
-    return {
+  return {
     score: totalScore,
     grade,
     summary:
@@ -369,8 +387,9 @@ export async function auditLandingPage(
       score: biggestProblem.score,
       finding: biggestProblem.findings[0] || "This area needs improvement.",
       recommendation:
-        biggestProblem.recommendations[0] || "Improve this section first."
+        biggestProblem.recommendations[0] || "Improve this section first.",
     },
     sections,
     topFixes,
   };
+}
