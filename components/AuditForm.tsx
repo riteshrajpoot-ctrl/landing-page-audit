@@ -4,7 +4,6 @@ import { useState } from "react";
 import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
-<BreakdownChart sections={result.sections} /> 
 import BreakdownChart from "./BreakdownChart";
 
 type AuditSectionType = {
@@ -128,7 +127,8 @@ export default function AuditForm() {
             finding={result.biggestLeak.finding}
             recommendation={result.biggestLeak.recommendation}
           />
-
+          <BreakdownChart sections={result.sections} />
+          
           <div className="section-grid">
             {result.sections.map((section, index) => (
               <AuditSection key={index} section={section} />
