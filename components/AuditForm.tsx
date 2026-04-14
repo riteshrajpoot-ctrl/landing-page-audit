@@ -111,7 +111,7 @@ export default function AuditForm() {
 
       {error && <div className="error-box">{error}</div>}
 
-            {result && (
+      {result && (
         <>
           <ScoreCard
             score={result.score}
@@ -134,3 +134,6 @@ export default function AuditForm() {
           </div>
         </>
       )}
+    </div>
+  );
+}
