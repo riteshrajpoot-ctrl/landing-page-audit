@@ -3,6 +3,7 @@
 import { useState } from "react";
 import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
+import BiggestLeakCard from "./BiggestLeakCard";
 
 type AuditSectionType = {
   title: string;
@@ -15,6 +16,12 @@ type AuditResponse = {
   score: number;
   grade: string;
   summary: string;
+  biggestLeak: {
+    title: string;
+    score: number;
+    finding: string;
+    recommendation: string;
+  };
   sections: AuditSectionType[];
   topFixes: string[];
 };
@@ -104,13 +111,20 @@ export default function AuditForm() {
 
       {error && <div className="error-box">{error}</div>}
 
-      {result && (
+            {result && (
         <>
           <ScoreCard
             score={result.score}
             grade={result.grade}
             summary={result.summary}
             topFixes={result.topFixes}
+          />
+
+          <BiggestLeakCard
+            title={result.biggestLeak.title}
+            score={result.biggestLeak.score}
+            finding={result.biggestLeak.finding}
+            recommendation={result.biggestLeak.recommendation}
           />
 
           <div className="section-grid">
@@ -120,6 +134,3 @@ export default function AuditForm() {
           </div>
         </>
       )}
-    </div>
-  );
-}

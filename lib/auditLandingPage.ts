@@ -357,14 +357,20 @@ export async function auditLandingPage(
     .flatMap((section) => section.recommendations)
     .slice(0, 5);
 
-  return {
+    return {
     score: totalScore,
     grade,
     summary:
       totalScore >= 70
-        ? `The page has a decent foundation, but ${biggestProblem.title.toLowerCase()} still needs improvement for better conversion performance.`
-        : `The page has visible gaps across messaging, usability, or performance. The biggest issue appears to be ${biggestProblem.title.toLowerCase()}.`,
+        ? `Your page has a decent foundation, but ${biggestProblem.title.toLowerCase()} still needs improvement for better conversion performance.`
+        : `Your page has visible gaps across messaging, usability, or performance. The biggest issue appears to be ${biggestProblem.title.toLowerCase()}.`,
+    biggestLeak: {
+      title: biggestProblem.title,
+      score: biggestProblem.score,
+      finding: biggestProblem.findings[0] || "This area needs improvement.",
+      recommendation:
+        biggestProblem.recommendations[0] || "Improve this section first."
+    },
     sections,
     topFixes,
   };
-}
