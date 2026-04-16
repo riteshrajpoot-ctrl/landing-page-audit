@@ -747,3 +747,17 @@ body {
     grid-template-columns: 1fr;
   }
 }
+.report-actions {
+  margin: 16px 0 10px;
+}
+
+.secondary-button {
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 12px 16px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}

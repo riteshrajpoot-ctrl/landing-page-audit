@@ -41,6 +41,15 @@ export default function ScoreCard({
           <p className="score-kicker">Landing Page Audit Result</p>
           <h2 className="score-heading">Overall Performance Snapshot</h2>
           <p className="score-summary">{summary}</p>
+          <div className="report-actions">
+            <button
+             type="button"
+             className="secondary-button"
+             onClick={() => window.print()}
+            >
+              Download PDF Report
+            </button>
+          </div>
 
           <div className="fix-panel">
             <h3 className="fix-title">Top Priority Fixes</h3>
