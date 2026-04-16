@@ -382,9 +382,17 @@ const html = await response.text();
 
   const biggestProblem = [...sections].sort((a, b) => a.score - b.score)[0];
 
-  const topFixes = sections
-    .flatMap((section) => section.recommendations)
-    .slice(0, 5);
+  const quickWins = sections
+  .filter((section) => section.score <= 12)
+  .flatMap((section) => section.recommendations.slice(0, 1))
+  .slice(0, 3);
+
+const strategicFixes = sections
+  .filter((section) => section.score > 12)
+  .flatMap((section) => section.recommendations.slice(0, 1))
+  .slice(0, 3);
+
+const topFixes = [...quickWins, ...strategicFixes].slice(0, 5);
 
   return {
     score: totalScore,
@@ -400,6 +408,9 @@ const html = await response.text();
       recommendation:
         biggestProblem.recommendations[0] || "Improve this section first.",
     },
+    quickWins,
+    strategicFixes,
+
     sections,
     topFixes,
   };
