@@ -767,3 +767,54 @@ body {
 .share-inline {
   margin: 10px 0 20px;
 }
+.lead-capture-card {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.lead-capture-content {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.lead-kicker {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #94a3b8;
+}
+
+.lead-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+}
+
+.lead-text {
+  margin: 0;
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.lead-form-row {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 12px;
+}
+
+.lead-button {
+  width: 100%;
+}
+
+.lead-message {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .lead-form-row {
+    grid-template-columns: 1fr;
+  }
+}

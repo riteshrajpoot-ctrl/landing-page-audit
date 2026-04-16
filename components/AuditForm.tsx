@@ -6,6 +6,8 @@ import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
 import BreakdownChart from "./BreakdownChart";
 import SectionDistributionChart from "./SectionDistributionChart";
+const [email, setEmail] = useState("");
+const [leadMessage, setLeadMessage] = useState("");
 
 type AuditSectionType = {
   title: string;
@@ -93,6 +95,23 @@ export default function AuditForm() {
       setLoading(false);
     }
   };
+  const handleLeadCapture = () => {
+  setLeadMessage("");
+
+  if (!email.trim()) {
+    setLeadMessage("Please enter your email.");
+    return;
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(email)) {
+    setLeadMessage("Please enter a valid email address.");
+    return;
+  }
+
+  setLeadMessage(`Thanks! Audit report capture ready for ${email}`);
+};
 
   return (
     <div>
@@ -163,6 +182,37 @@ export default function AuditForm() {
   >
     🔗 Copy Shareable Link
   </button>
+</div>
+<div className="card lead-capture-card">
+  <div className="lead-capture-content">
+    <div>
+      <p className="lead-kicker">Get This Audit in Your Inbox</p>
+      <h3 className="lead-title">Save and share this report later</h3>
+      <p className="lead-text">
+        Enter your email to keep a copy of this audit for future reference or
+        team review.
+      </p>
+    </div>
+
+    <div className="lead-form-row">
+      <input
+        type="email"
+        className="input"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <button
+        type="button"
+        className="button lead-button"
+        onClick={handleLeadCapture}
+      >
+        Send Report
+      </button>
+    </div>
+
+    {leadMessage && <p className="lead-message">{leadMessage}</p>}
+  </div>
 </div>
 
           <BiggestLeakCard
