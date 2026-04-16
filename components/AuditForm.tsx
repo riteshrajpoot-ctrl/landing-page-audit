@@ -152,30 +152,17 @@ export default function AuditForm() {
             quickWins={result.quickWins}
             strategicFixes={result.strategicFixes}
           />
-          <div className="share-link-card card">
-  <div className="share-link-header">
-    <p className="share-link-kicker">Shareable Audit Link</p>
-    <h3 className="share-link-title">Copy and share this audit setup</h3>
-  </div>
-
-  <div className="share-link-row">
-    <input
-      type="text"
-      className="input share-link-input"
-      value={shareLink || window.location.href}
-      readOnly
-    />
-    <button
-      type="button"
-      className="secondary-button"
-      onClick={async () => {
-        await navigator.clipboard.writeText(shareLink || window.location.href);
-        alert("Shareable link copied");
-      }}
-    >
-      Copy Link
-    </button>
-  </div>
+          <div className="share-inline">
+  <button
+    type="button"
+    className="secondary-button"
+    onClick={async () => {
+      await navigator.clipboard.writeText(window.location.href);
+      alert("Link copied");
+    }}
+  >
+    🔗 Copy Shareable Link
+  </button>
 </div>
 
           <BiggestLeakCard
