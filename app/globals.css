@@ -761,3 +761,6 @@ body {
   font-weight: 700;
   cursor: pointer;
 }
+.share-link-row {
+  margin-bottom: 20px;
+}

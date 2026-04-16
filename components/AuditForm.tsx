@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScoreCard from "./ScoreCard";
 import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
@@ -38,6 +38,18 @@ export default function AuditForm() {
   const [result, setResult] = useState<AuditResponse | null>(null);
   const [error, setError] = useState("");
 
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+
+  const savedUrl = params.get("url");
+  const savedKeyword = params.get("keyword");
+  const savedGoal = params.get("goal");
+
+  if (savedUrl) setUrl(savedUrl);
+  if (savedKeyword) setKeyword(savedKeyword);
+  if (savedGoal) setGoal(savedGoal);
+}, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -60,6 +72,13 @@ export default function AuditForm() {
       }
 
       setResult(data);
+      const params = new URLSearchParams();
+      params.set("url", url);
+      if (keyword) params.set("keyword", keyword);
+      if (goal) params.set("goal", goal);
+      
+      window.history.replaceState({}, "", `?${params.toString()}`);
+
     } catch (err: any) {
       setError(err.message || "Audit failed");
     } finally {
@@ -125,6 +144,18 @@ export default function AuditForm() {
             quickWins={result.quickWins}
             strategicFixes={result.strategicFixes}
           />
+          <div className="share-link-row">
+            <button
+            type="button"
+            className="secondary-button"
+            onClick={async () => {
+              await navigator.clipboard.writeText(window.location.href);
+              alert("Shareable link copied");
+            }}
+          >
+            Copy Shareable Link
+          </button>
+</div>
 
           <BiggestLeakCard
             title={result.biggestLeak.title}
