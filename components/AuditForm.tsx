@@ -6,8 +6,6 @@ import AuditSection from "./AuditSection";
 import BiggestLeakCard from "./BiggestLeakCard";
 import BreakdownChart from "./BreakdownChart";
 import SectionDistributionChart from "./SectionDistributionChart";
-const [email, setEmail] = useState("");
-const [leadMessage, setLeadMessage] = useState("");
 
 type AuditSectionType = {
   title: string;
@@ -34,28 +32,43 @@ type AuditResponse = {
 
 export default function AuditForm() {
   const [url, setUrl] = useState("");
-  const [shareLink, setShareLink] = useState("");
   const [keyword, setKeyword] = useState("");
   const [goal, setGoal] = useState("Lead Generation");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<AuditResponse | null>(null);
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [leadMessage, setLeadMessage] = useState("");
 
   useEffect(() => {
-  const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
 
-  const savedUrl = params.get("url");
-  const savedKeyword = params.get("keyword");
-  const savedGoal = params.get("goal");
+    const savedUrl = params.get("url");
+    const savedKeyword = params.get("keyword");
+    const savedGoal = params.get("goal");
 
-  if (savedUrl) setUrl(savedUrl);
-  if (savedKeyword) setKeyword(savedKeyword);
-  if (savedGoal) setGoal(savedGoal);
+    if (savedUrl) setUrl(savedUrl);
+    if (savedKeyword) setKeyword(savedKeyword);
+    if (savedGoal) setGoal(savedGoal);
+  }, []);
 
-  if (window.location.search) {
-    setShareLink(window.location.href);
-  }
-}, []);
+  const handleLeadCapture = () => {
+    setLeadMessage("");
+
+    if (!email.trim()) {
+      setLeadMessage("Please enter your email.");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(email)) {
+      setLeadMessage("Please enter a valid email address.");
+      return;
+    }
+
+    setLeadMessage(`Thanks! Audit report capture ready for ${email}`);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,39 +92,19 @@ export default function AuditForm() {
       }
 
       setResult(data);
+
       const params = new URLSearchParams();
       params.set("url", url);
       if (keyword) params.set("keyword", keyword);
       if (goal) params.set("goal", goal);
-      
-      const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-      
-      window.history.replaceState({}, "", `?${params.toString()}`);
-      setShareLink(newUrl);
 
+      window.history.replaceState({}, "", `?${params.toString()}`);
     } catch (err: any) {
       setError(err.message || "Audit failed");
     } finally {
       setLoading(false);
     }
   };
-  const handleLeadCapture = () => {
-  setLeadMessage("");
-
-  if (!email.trim()) {
-    setLeadMessage("Please enter your email.");
-    return;
-  }
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailPattern.test(email)) {
-    setLeadMessage("Please enter a valid email address.");
-    return;
-  }
-
-  setLeadMessage(`Thanks! Audit report capture ready for ${email}`);
-};
 
   return (
     <div>
@@ -161,7 +154,7 @@ export default function AuditForm() {
 
       {error && <div className="error-box">{error}</div>}
 
-            {result && (
+      {result && (
         <>
           <ScoreCard
             score={result.score}
@@ -171,49 +164,51 @@ export default function AuditForm() {
             quickWins={result.quickWins}
             strategicFixes={result.strategicFixes}
           />
+
           <div className="share-inline">
-  <button
-    type="button"
-    className="secondary-button"
-    onClick={async () => {
-      await navigator.clipboard.writeText(window.location.href);
-      alert("Link copied");
-    }}
-  >
-    🔗 Copy Shareable Link
-  </button>
-</div>
-<div className="card lead-capture-card">
-  <div className="lead-capture-content">
-    <div>
-      <p className="lead-kicker">Get This Audit in Your Inbox</p>
-      <h3 className="lead-title">Save and share this report later</h3>
-      <p className="lead-text">
-        Enter your email to keep a copy of this audit for future reference or
-        team review.
-      </p>
-    </div>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={async () => {
+                await navigator.clipboard.writeText(window.location.href);
+                alert("Link copied");
+              }}
+            >
+              Copy Audit Link
+            </button>
+          </div>
 
-    <div className="lead-form-row">
-      <input
-        type="email"
-        className="input"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <button
-        type="button"
-        className="button lead-button"
-        onClick={handleLeadCapture}
-      >
-        Send Report
-      </button>
-    </div>
+          <div className="card lead-capture-card">
+            <div className="lead-capture-content">
+              <div>
+                <p className="lead-kicker">Get This Audit in Your Inbox</p>
+                <h3 className="lead-title">Save and share this report later</h3>
+                <p className="lead-text">
+                  Enter your email to keep a copy of this audit for future
+                  reference or team review.
+                </p>
+              </div>
 
-    {leadMessage && <p className="lead-message">{leadMessage}</p>}
-  </div>
-</div>
+              <div className="lead-form-row">
+                <input
+                  type="email"
+                  className="input"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="button lead-button"
+                  onClick={handleLeadCapture}
+                >
+                  Send Report
+                </button>
+              </div>
+
+              {leadMessage && <p className="lead-message">{leadMessage}</p>}
+            </div>
+          </div>
 
           <BiggestLeakCard
             title={result.biggestLeak.title}
@@ -221,15 +216,16 @@ export default function AuditForm() {
             finding={result.biggestLeak.finding}
             recommendation={result.biggestLeak.recommendation}
           />
+
           <BreakdownChart sections={result.sections} />
 
           <div className="section-grid">
-  {result.sections.map((section, index) => (
-    <AuditSection key={index} section={section} />
-  ))}
+            {result.sections.map((section, index) => (
+              <AuditSection key={index} section={section} />
+            ))}
 
-  <SectionDistributionChart sections={result.sections} />
-</div>
+            <SectionDistributionChart sections={result.sections} />
+          </div>
         </>
       )}
     </div>
