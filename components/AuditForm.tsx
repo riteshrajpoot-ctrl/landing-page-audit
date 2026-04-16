@@ -24,6 +24,8 @@ type AuditResponse = {
     finding: string;
     recommendation: string;
   };
+  quickWins: string[];
+  strategicFixes: string[];
   sections: AuditSectionType[];
   topFixes: string[];
 };
@@ -120,6 +122,8 @@ export default function AuditForm() {
             grade={result.grade}
             summary={result.summary}
             topFixes={result.topFixes}
+            quickWins={result.quickWins}
+            strategicFixes={result.strategicFixes}
           />
 
           <BiggestLeakCard

@@ -701,3 +701,49 @@ body {
   font-weight: 700;
   color: #f8fafc;
 }
+.fix-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 20px;
+}
+
+.fix-column-title {
+  font-size: 16px;
+  margin: 0 0 10px;
+}
+
+.fix-list-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-fix-chip {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+  line-height: 1.6;
+}
+
+.mini-fix-chip.quick {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(30, 64, 175, 0.16);
+}
+
+.mini-fix-chip.strategy {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(146, 64, 14, 0.16);
+}
+
+.mini-fix-chip.empty {
+  opacity: 0.75;
+}
+
+@media (max-width: 900px) {
+  .fix-columns {
+    grid-template-columns: 1fr;
+  }
+}

@@ -3,6 +3,8 @@ type Props = {
   grade: string;
   summary: string;
   topFixes: string[];
+  quickWins: string[];
+  strategicFixes: string[];
 };
 
 function getScoreTone(score: number) {
@@ -17,6 +19,8 @@ export default function ScoreCard({
   grade,
   summary,
   topFixes,
+  quickWins,
+  strategicFixes,
 }: Props) {
   const tone = getScoreTone(score);
 
@@ -47,6 +51,40 @@ export default function ScoreCard({
                   <span>{fix}</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="fix-columns">
+            <div className="fix-column">
+              <h4 className="fix-column-title">Quick Wins</h4>
+              <div className="fix-list-block">
+                {quickWins.length ? (
+                  quickWins.map((fix, index) => (
+                    <div className="mini-fix-chip quick" key={index}>
+                      {fix}
+                    </div>
+                  ))
+                ) : (
+                  <div className="mini-fix-chip empty">No quick wins found.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="fix-column">
+              <h4 className="fix-column-title">Strategic Improvements</h4>
+              <div className="fix-list-block">
+                {strategicFixes.length ? (
+                  strategicFixes.map((fix, index) => (
+                    <div className="mini-fix-chip strategy" key={index}>
+                      {fix}
+                    </div>
+                  ))
+                ) : (
+                  <div className="mini-fix-chip empty">
+                    No strategic improvements found.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
